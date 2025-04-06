@@ -1,6 +1,6 @@
 (function() {
     // Указываем цветовой лейбл для поиска слоев
-    var targetLabel = 1; // Здесь используем лейбл с индексом 5 (вы можете изменить это на нужный вам лейбл)
+    var targetLabel = 14; // Здесь используем лейбл с индексом 5 (вы можете изменить это на нужный вам лейбл)
 
     // Получаем все композиции в проекте
     var projectItems = app.project.items;
@@ -21,12 +21,6 @@
             // Перебираем все слои в композиции
             for (var j = 1; j <= comp.numLayers; j++) {
                 var layer = comp.layer(j);
-
-                alert(layer.label);
-                if (layer instanceof ShapeLayer) {
-                    alert("ShapeLayer");
-                }
-                alert(layer.name);
 
                 // Проверяем, имеет ли слой нужный цветовой лейбл
                 if (layer.label == targetLabel) {
@@ -51,6 +45,7 @@
 
                     // Формируем CSS данные для текущего слоя
                     var cssBlock = "#" + compName + "-" + layerName + " {\n" + // Добавляем название композиции
+                                   "  position: absolute;\n" +
                                    "  top: " + topMargin + "px;\n" +
                                    "  left: " + leftMargin + "px;\n" +
                                    "  width: " + width + "px;\n" +
