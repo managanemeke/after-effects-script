@@ -1,7 +1,7 @@
 (function() {
     var rootDirectory = app.project.file.parent;
     var substratesDirectory = rootDirectory.fsName + "/" + "substrates";
-    var highQualityWithAlpha = "High Quality with Alpha";
+    var highQualityWithAlpha = selectOutputModuleTemplate();
 
     saveSubstrates();
 
@@ -20,6 +20,44 @@
         if (projectItems.length > 0) {
             openSubstratesDirectory();
         }
+    }
+
+    function selectOutputModuleTemplate() {
+        var tempComp = app.project.items.addComp("temp", 1920, 1080, 1.0, 1.0, 30);
+        var rqItem = app.project.renderQueue.items.add(tempComp);
+        var outModule = rqItem.outputModules.add();
+        
+        var omTemplates = [];
+        for (var i = 1; i <= outModule.templates.length; i++) {
+            omTemplates.push(outModule.templates[i]);
+        }
+        
+        clearRenderQueue();
+        tempComp.remove();
+        
+        if (omTemplates.length === 0) {
+            alert("Нет доступных шаблонов Output Module.\nСоздайте их через Edit > Templates > Output Module");
+            return "";
+        }
+        
+        var dialog = new Window("dialog", "Выберите Output Module Template");
+        
+        var dropGroup = dialog.add("group");
+        dropGroup.alignChildren = ["left", "center"];
+        dropGroup.add("statictext", undefined, "Шаблон:");
+        
+        var dropdown = dropGroup.add("dropdownlist", undefined, omTemplates);
+        dropdown.selection = 0;
+        
+        var btnGroup = dialog.add("group");
+        btnGroup.alignment = "right";
+        btnGroup.add("button", undefined, "OK");
+        
+        if (dialog.show() === 1) {
+            return omTemplates[dropdown.selection.index];
+        }
+        
+        return null;
     }
 
     function addCompositionToRenderQueue(comp) {
