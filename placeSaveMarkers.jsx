@@ -14,17 +14,21 @@
     }
 
     function promptForTimeStamp() {
-        var promptText = "Введите временную метку (формат ЧЧ:ММ:СС:КК):";
+        var dialog = new Window("dialog", "Расставить маркеры сохранения");
         
-        while (true) {
-            var userInput = prompt(promptText, defaultTime);
-            if (userInput === null) return null;
-            if (isValidTimeFormat(userInput)) {
-                return userInput;
-            } else {
-                alert("Неверный формат времени!\nИспользуйте формат ЧЧ:ММ:СС:КК", "Ошибка ввода");
-                defaultTime = userInput;
-            }
+        var dropGroup = dialog.add("group");
+        dropGroup.alignChildren = ["left", "center"];
+        dropGroup.add("statictext", undefined, "Временная метка (ЧЧ:ММ:СС:КК):");
+        
+        var selectedTimeStamp = dropGroup.add("edittext", undefined, defaultTime);
+        selectedTimeStamp.characters = 11;
+        
+        var btnGroup = dialog.add("group");
+        btnGroup.alignment = "right";
+        btnGroup.add("button", undefined, "OK");
+        
+        if (dialog.show() === 1) {
+            return selectedTimeStamp.text;
         }
     }
 
