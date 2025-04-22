@@ -62,7 +62,7 @@
 
     function addCompositionToRenderQueue(comp) {
         comp.openInViewer();
-        setTimeToFirstMarkerIfExists();
+        setTimeToFirstSaveMarkerIfExists();
         addActiveFrameToQueueAsPng();
     }
 
@@ -75,13 +75,18 @@
         return comp;
     }
 
-    function setTimeToFirstMarkerIfExists() {
+    function setTimeToFirstSaveMarkerIfExists() {
         var comp = activeComp();
         var markers = comp.markerProperty;
         if (markers.numKeys === 0) {
             return;
         }
-        comp.time = markers.keyTime(1);
+        for (var i = 1; i <= markers.numKeys; i++) {
+            if (markers.keyValue(i).comment === "save") {
+                comp.time = markers.keyTime(i);
+                return;
+            }
+        }
     }
 
     function openSubstratesDirectory() {
