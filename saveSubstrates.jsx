@@ -1,6 +1,7 @@
 (function() {
     var saveFolder = "comps";
-    var rootDirectory = app.project.file.parent;
+    var defaultSaveDirectory = Folder.desktop;
+    var rootDirectory = detectRootDirectory();
     var substratesDirectory = rootDirectory.fsName + "/" + "substrates";
     var outputModuleTemplate = selectOutputModuleTemplate();
 
@@ -8,8 +9,10 @@
 
     function saveSubstrates() {
         app.project.renderQueue.showWindow(false);
+        createDirectoryIfNeeded(substratesDirectory);
         clearRenderQueue();
         var projectItems = app.project.items;
+        var savedAmount = 0;
         for (var i = 1; i <= projectItems.length; i++) {
             var item = projectItems[i];
             if (
@@ -17,13 +20,32 @@
                 && isInsideSaveFolder(item)
             ) {
                 addCompositionToRenderQueue(item);
+                savedAmount++;
             }
         }
         runRenderQueue();
         clearRenderQueue();
-        if (projectItems.length > 0) {
+        if (savedAmount > 0) {
             openSubstratesDirectory();
         }
+    }
+
+    function detectRootDirectory() {
+        if (isProjectSaved()) {
+            return app.project.file.parent;
+        }
+        return defaultSaveDirectory;
+    }
+
+    function createDirectoryIfNeeded(directory) {
+        var folder = new Folder(directory);
+        if (!folder.exists) {
+            folder.create();
+        }
+    }
+
+    function isProjectSaved() {
+        return app.project.file !== null;
     }
 
     function isInsideSaveFolder(comp) {
@@ -148,7 +170,9 @@
 
     function runRenderQueue() {
         var queue = app.project.renderQueue;
-        queue.render();
+        if (queue.numItems > 0) {
+            queue.render();
+        }
     }
 
     function clearRenderQueue() {
