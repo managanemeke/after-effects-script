@@ -1,4 +1,5 @@
 (function() {
+    var compsFolder = "comps";
     var rootDirectory = app.project.file.parent;
     var substratesDirectory = rootDirectory.fsName + "/" + "substrates";
     var highQualityWithAlpha = selectOutputModuleTemplate();
@@ -11,7 +12,10 @@
         var projectItems = app.project.items;
         for (var i = 1; i <= projectItems.length; i++) {
             var item = projectItems[i];
-            if (item instanceof CompItem) {
+            if (
+                item instanceof CompItem
+                && isInsideCompsFolder(item)
+            ) {
                 addCompositionToRenderQueue(item);
             }
         }
@@ -20,6 +24,17 @@
         if (projectItems.length > 0) {
             openSubstratesDirectory();
         }
+    }
+
+    function isInsideCompsFolder(comp) {
+        var parentFolder = comp.parentFolder;
+        if (
+            parentFolder !== null
+            && parentFolder.name.toLowerCase() === compsFolder
+        ) {
+            return true;
+        }
+        return false;
     }
 
     function selectOutputModuleTemplate() {
