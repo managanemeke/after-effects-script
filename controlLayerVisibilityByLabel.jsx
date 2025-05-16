@@ -1,21 +1,17 @@
-(function() {
-    // Проверка доступности After Effects
+(function () {
     if (typeof app === 'undefined' || !app.project) {
         alert("Ошибка: After Effects не запущен или проект не открыт");
         return;
     }
 
-    // Функция безопасного получения цветов меток
     function getLabelColors() {
         try {
-            // Альтернативный способ получить цвета меток
             var colors = [];
             for (var i = 0; i < 16; i++) {
                 colors.push(app.project.label(i + 1).color);
             }
             return colors;
         } catch (e) {
-            // Если не сработало - возвращаем стандартные цвета AE
             return [
                 [0.63, 0.13, 0.13], [0.85, 0.27, 0.27], [0.16, 0.49, 0.65],
                 [0.89, 0.27, 0.58], [0.62, 0.36, 0.68], [0.98, 0.73, 0.02],
@@ -26,11 +22,9 @@
         }
     }
 
-    // Получаем цвета меток
     var labelColors = getLabelColors();
     var availableLabels = [];
 
-    // Формируем список доступных меток
     for (var i = 0; i < labelColors.length; i++) {
         availableLabels.push({
             index: i + 1,
@@ -39,7 +33,6 @@
         });
     }
 
-    // Функция изменения видимости слоёв
     function setLayerVisibility(labelIndex, action) {
         if (!app.project || app.project.numItems === 0) {
             alert("В проекте нет композиций!");
@@ -65,35 +58,53 @@
         alert("Слои с меткой " + labelIndex + " были " + (enable ? "включены" : "отключены"));
     }
 
-    // Создаём интерфейс
-    var win = new Window("palette", "Управление слоями по меткам", undefined, {
-        borderless: true
-    });
+    // UI
+    var win = new Window("palette", "Управление слоями по меткам", undefined);
     win.orientation = "column";
     win.spacing = 10;
     win.margins = 15;
 
-    // Выбор метки
     var labelGroup = win.add("group");
+    labelGroup.orientation = "row";
+    labelGroup.alignment = "left";
+
     labelGroup.add("statictext", undefined, "Выберите метку:");
+
     var dropdown = labelGroup.add("dropdownlist", undefined,
-        availableLabels.map(function(label) {
+        availableLabels.map(function (label) {
             return label.name;
         })
     );
     dropdown.selection = 0;
 
-    // Кнопки управления
+    // Цветной прямоугольник
+    var colorPreview = labelGroup.add("panel", undefined, "");
+    colorPreview.preferredSize = [25, 25];
+    colorPreview.margins = 0;
+
+    function updateColorPreview(index) {
+        var c = availableLabels[index].color;
+        colorPreview.graphics.backgroundColor = colorPreview.graphics.newBrush(colorPreview.graphics.BrushType.SOLID_COLOR, c);
+        colorPreview.graphics.disabledBackgroundColor = colorPreview.graphics.backgroundColor;
+        colorPreview.graphics.foregroundColor = colorPreview.graphics.newPen(colorPreview.graphics.PenType.SOLID_COLOR, [0, 0, 0], 1);
+    }
+
+    updateColorPreview(dropdown.selection.index);
+
+    dropdown.onChange = function () {
+        updateColorPreview(dropdown.selection.index);
+    };
+
     var btnGroup = win.add("group");
     btnGroup.alignment = "center";
 
     var enableBtn = btnGroup.add("button", undefined, "Включить");
-    enableBtn.onClick = function() {
+    enableBtn.onClick = function () {
         setLayerVisibility(dropdown.selection.index + 1, "enable");
     };
 
     var disableBtn = btnGroup.add("button", undefined, "Отключить");
-    disableBtn.onClick = function() {
+    disableBtn.onClick = function () {
         setLayerVisibility(dropdown.selection.index + 1, "disable");
     };
 
