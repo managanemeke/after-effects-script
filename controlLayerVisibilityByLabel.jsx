@@ -1,83 +1,102 @@
-(function () {
-    // Function to get the label color index based on the color name
-    function getLabelColorIndex(colorName) {
-        var labelColors = {
-            "Red Pigment": 1, "Sunflower": 2, "Mediterranean Sea": 3, "Bara Red": 4, 
-            "Lavender Tea": 5, "Radiant Yellow": 6, "Turkish Aqua": 7, "Merchant Marine Blue": 8, 
-            "Android Green": 9, "Nasu Purple": 10, "Puffins Bill": 11, "Pencil Lead": 12, 
-            "Very Berry": 13, "Blue Martina": 14, "Forgotten Purple": 15, "Pixelated Grass": 16
-        };
-        return labelColors[colorName] || null;
+(function() {
+    // Проверка доступности After Effects
+    if (typeof app === 'undefined' || !app.project) {
+        alert("Ошибка: After Effects не запущен или проект не открыт");
+        return;
     }
 
-    // Function to set layer visibility in all compositions
-    function setLayerVisibilityInAllComps(colorName, action) {
-        if (app.project.numItems === 0) {
-            alert("No compositions found in the project!");
+    // Функция безопасного получения цветов меток
+    function getLabelColors() {
+        try {
+            // Альтернативный способ получить цвета меток
+            var colors = [];
+            for (var i = 0; i < 16; i++) {
+                colors.push(app.project.label(i + 1).color);
+            }
+            return colors;
+        } catch (e) {
+            // Если не сработало - возвращаем стандартные цвета AE
+            return [
+                [0.63, 0.13, 0.13], [0.85, 0.27, 0.27], [0.16, 0.49, 0.65],
+                [0.89, 0.27, 0.58], [0.62, 0.36, 0.68], [0.98, 0.73, 0.02],
+                [0.02, 0.66, 0.62], [0.16, 0.36, 0.59], [0.4, 0.8, 0.22],
+                [0.5, 0.2, 0.6], [0.9, 0.5, 0.2], [0.3, 0.3, 0.3],
+                [0.8, 0.2, 0.4], [0.2, 0.6, 0.8], [0.5, 0.3, 0.7], [0.3, 0.7, 0.4]
+            ];
+        }
+    }
+
+    // Получаем цвета меток
+    var labelColors = getLabelColors();
+    var availableLabels = [];
+
+    // Формируем список доступных меток
+    for (var i = 0; i < labelColors.length; i++) {
+        availableLabels.push({
+            index: i + 1,
+            color: labelColors[i],
+            name: "Label " + (i + 1)
+        });
+    }
+
+    // Функция изменения видимости слоёв
+    function setLayerVisibility(labelIndex, action) {
+        if (!app.project || app.project.numItems === 0) {
+            alert("В проекте нет композиций!");
             return;
         }
 
-        var colorIndex = getLabelColorIndex(colorName);
-        if (!colorIndex) {
-            alert("Invalid color name!");
-            return;
-        }
+        var enable = (action === "enable");
+        app.beginUndoGroup((enable ? "Включение" : "Отключение") + " слоёв с меткой " + labelIndex);
 
-        var enableLayer = (action.toLowerCase() === "enable");
-
-        app.beginUndoGroup("Set Layer Visibility by Color in All Comps");
-
-        // Iterate through all items in the project
         for (var i = 1; i <= app.project.numItems; i++) {
             var item = app.project.item(i);
             if (item instanceof CompItem) {
-                // Iterate through all layers in the composition
                 for (var j = 1; j <= item.numLayers; j++) {
                     var layer = item.layer(j);
-                    if (layer.label === colorIndex) {
-                        layer.enabled = enableLayer;
+                    if (layer.label === labelIndex) {
+                        layer.enabled = enable;
                     }
                 }
             }
         }
 
         app.endUndoGroup();
-        alert("Layers updated in all compositions.");
+        alert("Слои с меткой " + labelIndex + " были " + (enable ? "включены" : "отключены"));
     }
 
-    // Create a window for the GUI
-    var win = new Window("palette", "Set Layer Visibility", undefined);
+    // Создаём интерфейс
+    var win = new Window("palette", "Управление слоями по меткам", undefined, {
+        borderless: true
+    });
     win.orientation = "column";
+    win.spacing = 10;
+    win.margins = 15;
 
-    // Dropdown for selecting the label color
-    var colorGroup = win.add("group");
-    colorGroup.add("statictext", undefined, "Select Label Color:");
-    var colorDropdown = colorGroup.add("dropdownlist", undefined, [
-        "Red Pigment", "Sunflower", "Mediterranean Sea", "Bara Red", 
-        "Lavender Tea", "Radiant Yellow", "Turkish Aqua", "Merchant Marine Blue", 
-        "Android Green", "Nasu Purple", "Puffins Bill", "Pencil Lead", 
-        "Very Berry", "Blue Martina", "Forgotten Purple", "Pixelated Grass"
-    ]);
-    colorDropdown.selection = 0; // Default to the first color (Red Pigment)
+    // Выбор метки
+    var labelGroup = win.add("group");
+    labelGroup.add("statictext", undefined, "Выберите метку:");
+    var dropdown = labelGroup.add("dropdownlist", undefined,
+        availableLabels.map(function(label) {
+            return label.name;
+        })
+    );
+    dropdown.selection = 0;
 
-    // Group for Enable/Disable buttons
-    var buttonGroup = win.add("group");
-    
-    // Enable button
-    var enableButton = buttonGroup.add("button", undefined, "Enable Layers");
-    enableButton.onClick = function () {
-        var selectedColor = colorDropdown.selection.text;
-        setLayerVisibilityInAllComps(selectedColor, "Enable");
+    // Кнопки управления
+    var btnGroup = win.add("group");
+    btnGroup.alignment = "center";
+
+    var enableBtn = btnGroup.add("button", undefined, "Включить");
+    enableBtn.onClick = function() {
+        setLayerVisibility(dropdown.selection.index + 1, "enable");
     };
 
-    // Disable button
-    var disableButton = buttonGroup.add("button", undefined, "Disable Layers");
-    disableButton.onClick = function () {
-        var selectedColor = colorDropdown.selection.text;
-        setLayerVisibilityInAllComps(selectedColor, "Disable");
+    var disableBtn = btnGroup.add("button", undefined, "Отключить");
+    disableBtn.onClick = function() {
+        setLayerVisibility(dropdown.selection.index + 1, "disable");
     };
 
-    // Show the GUI
     win.center();
     win.show();
 })();
