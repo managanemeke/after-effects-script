@@ -1,4 +1,4 @@
-(function renameCompsBySizeWithSafeRenaming() {
+(function renameCompositions() {
     const COLUMN_SEPARATOR = ";";
 
     var proj = app.project;
