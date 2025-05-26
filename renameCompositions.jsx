@@ -1,4 +1,6 @@
 (function renameCompsBySizeWithSafeRenaming() {
+    const COLUMN_SEPARATOR = ",";
+
     var proj = app.project;
     if (!proj) {
         alert("No project open.");
@@ -28,7 +30,7 @@
         var line = lines[i].trim();
         if (!line) continue;
 
-        var parts = line.split(",");
+        var parts = line.split(COLUMN_SEPARATOR);
         if (parts.length < 3) continue;
 
         var name = parts[0].trim();
