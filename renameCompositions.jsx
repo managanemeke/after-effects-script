@@ -104,7 +104,7 @@
         if (!assignedNames[sizeKey]) assignedNames[sizeKey] = [];
 
         var namesLeft = availableNames.filter(function(n) {
-            return assignedNames[sizeKey].indexOf(n) === -1;
+            return assignedNames[sizeKey] && assignedNames[sizeKey].indexOf(n) === -1;
         });
 
         if (namesLeft.length === 0) {
