@@ -24,7 +24,7 @@
     var lines = csvContent.split(/\r?\n/);
     var sizeToNames = {};
 
-    for (var i = 1; i < lines.length; i++) {
+    for (var i = 0; i < lines.length; i++) {
         var line = lines[i].trim();
         if (!line) continue;
 
