@@ -103,16 +103,28 @@
 
         if (!assignedNames[sizeKey]) assignedNames[sizeKey] = [];
 
-        var namesLeft = availableNames.filter(function(n) {
-            if (!assignedNames[sizeKey]) return false;
+        var namesLeft = [];
+        var i = 0;
+        while (i < availableNames.length) {
+            var n = availableNames[i];
+            var shouldInclude = true;
 
-            for (var i = 0; i < assignedNames[sizeKey].length; i++) {
-                if (assignedNames[sizeKey][i] === n) {
-                    return false;
+            if (assignedNames[sizeKey]) {
+                var j = 0;
+                while (j < assignedNames[sizeKey].length) {
+                    if (assignedNames[sizeKey][j] === n) {
+                        shouldInclude = false;
+                        break;
+                    }
+                    j++;
                 }
             }
-            return true;
-        });
+
+            if (shouldInclude) {
+                namesLeft[namesLeft.length] = n;
+            }
+            i++;
+        }
 
         if (namesLeft.length === 0) {
             $.writeln("ℹ️ All names used for size " + sizeKey + ". Skipping comp #" + (idx + 1));
