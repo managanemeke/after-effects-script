@@ -1,5 +1,4 @@
 {
-    // Configuration: Map of base comp sizes to target resize options with custom names
     var resizeConfig = {
         "2880x960": [
             {width: 1344, height: 448, name: "KRSNRSK"},
@@ -123,7 +122,6 @@
         ]
     };
 
-    // Case-insensitive folder search
     function findFolderByNameIgnoreCase(folderName) {
         var targetName = folderName.toLowerCase();
         for (var i = 1; i <= app.project.numItems; i++) {
@@ -135,7 +133,6 @@
         return null;
     }
 
-    // Only comps in the matched folder with exact size
     function findCompsMatchingSizeInFolder(width, height, folder) {
         var matches = [];
         for (var i = 1; i <= app.project.numItems; i++) {
@@ -152,7 +149,6 @@
         return matches;
     }
 
-    // Duplicate comp and apply new size and name
     function duplicateAndResizeComp(baseComp, targetSizes) {
         var duplicates = [];
 
@@ -165,14 +161,12 @@
             newComp.width = size.width;
             newComp.height = size.height;
 
-            // ❌ No layer scaling
             duplicates.push(newComp);
         }
 
         return duplicates;
     }
 
-    // Main runner
     function runBatchResize(config) {
         app.beginUndoGroup("Batch Duplicate & Resize Comps");
 
