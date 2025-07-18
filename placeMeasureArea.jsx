@@ -21,7 +21,7 @@
     fill.property("Color").setValue([1, 0, 0.588]);
 
     var textLayer = comp.layers.addText("Coverage %");
-    textLayer.name = "Coverage Text";
+    textLayer.name = "measure-area-text";
 
     var layerControl = textLayer.property("Effects").addProperty("ADBE Layer Control");
     layerControl.name = "Layer Control";
