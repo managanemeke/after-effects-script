@@ -7,7 +7,6 @@
 
     app.beginUndoGroup("Create Shape Coverage Setup");
 
-    // === 1. Create Shape Layer ===
     var shapeLayer = comp.layers.addShape();
     shapeLayer.name = "Shape Layer 1";
 
@@ -15,26 +14,20 @@
     var rectGroup = contents.addProperty("ADBE Vector Group");
     rectGroup.name = "Rectangle 1";
 
-    // Add rectangle path and set size to comp dimensions
     var rectPath = rectGroup.property("Contents").addProperty("ADBE Vector Shape - Rect");
     rectPath.property("Size").setValue([comp.width, comp.height]);
 
-    // Add Fill with color #FF0096
     var fill = rectGroup.property("Contents").addProperty("ADBE Vector Graphic - Fill");
-    fill.property("Color").setValue([1, 0, 0.588]); // #FF0096 in RGB (0–1)
+    fill.property("Color").setValue([1, 0, 0.588]);
 
-    // === 2. Create Text Layer ===
     var textLayer = comp.layers.addText("Coverage %");
     textLayer.name = "Coverage Text";
 
-    // === 3. Add Layer Control Effect ===
     var layerControl = textLayer.property("Effects").addProperty("ADBE Layer Control");
     layerControl.name = "Layer Control";
 
-    // Link Layer Control to the shape layer
     layerControl.property("Layer").setValue(shapeLayer.index);
 
-    // === 4. Apply Expression to Source Text ===
     var expression = 
         'l = effect("Layer Control")("Layer");\n' +
         'if (l != null && l.content("Rectangle 1") != null) {\n' +
