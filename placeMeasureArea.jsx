@@ -8,7 +8,7 @@
     app.beginUndoGroup("Create Shape Coverage Setup");
 
     var shapeLayer = comp.layers.addShape();
-    shapeLayer.name = "Shape Layer 1";
+    shapeLayer.name = "measure-area-shape";
 
     var contents = shapeLayer.property("Contents");
     var rectGroup = contents.addProperty("ADBE Vector Group");
