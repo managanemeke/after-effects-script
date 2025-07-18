@@ -12,7 +12,7 @@
 
     var contents = shapeLayer.property("Contents");
     var rectGroup = contents.addProperty("ADBE Vector Group");
-    rectGroup.name = "Rectangle 1";
+    rectGroup.name = "measure-area-group";
 
     var rectPath = rectGroup.property("Contents").addProperty("ADBE Vector Shape - Rect");
     rectPath.property("Size").setValue([comp.width, comp.height]);
@@ -30,12 +30,12 @@
 
     var expression = 
         'l = effect("Layer Control")("Layer");\n' +
-        'if (l != null && l.content("Rectangle 1") != null) {\n' +
-        '    w = l.content("Rectangle 1").content("Rectangle Path 1").size[0];\n' +
-        '    h = l.content("Rectangle 1").content("Rectangle Path 1").size[1];\n' +
+        'if (l != null && l.content("measure-area-group") != null) {\n' +
+        '    w = l.content("measure-area-group").content("Rectangle Path 1").size[0];\n' +
+        '    h = l.content("measure-area-group").content("Rectangle Path 1").size[1];\n' +
         '    scaleLayerX = l.transform.scale[0] / 100;\n' +
         '    scaleLayerY = l.transform.scale[1] / 100;\n' +
-        '    scaleGroup = l.content("Rectangle 1").transform.scale[0] / 100;\n' +
+        '    scaleGroup = l.content("measure-area-group").transform.scale[0] / 100;\n' +
         '    S_block = w * scaleLayerX * scaleGroup * h * scaleLayerY * scaleGroup;\n' +
         '    S_comp = thisComp.width * thisComp.height;\n' +
         '    S_percent = Math.abs(S_block / S_comp * 100);\n' +
