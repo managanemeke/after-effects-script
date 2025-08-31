@@ -32,8 +32,8 @@
         if (parts.length < 3) continue;
 
         var name = parts[0].trim();
-        var width = parseInt(parts[2].trim(), 10);
-        var height = parseInt(parts[3].trim(), 10);
+        var width = parseInt(parts[1].trim(), 10);
+        var height = parseInt(parts[2].trim(), 10);
         if (isNaN(width) || isNaN(height)) continue;
 
         var key = width + "x" + height;
